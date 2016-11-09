@@ -91,3 +91,5 @@ getCRTeffect <- function(alpha = 0.05, power = 0.80, ICC = 0.001,
                    tol = tol, extendInt = "upX")$root
   return(delta)
 }
+
+# change
