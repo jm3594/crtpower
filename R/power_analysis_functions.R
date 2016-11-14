@@ -21,8 +21,8 @@
 # OUTPUT:
 # pwr is the calculated power
 
-getCRTPower <- function(alpha = 0.05, effect, ICC,
-                        M, n, type = "standard", cv = NULL){
+get_power <- function(alpha = 0.05, effect, ICC,
+                      M, n, type = "standard", cv = NULL){
 
   # cv value needs to be present if type = cv
   if (type == "cv" & is.null(cv)) {
@@ -64,9 +64,9 @@ getCRTPower <- function(alpha = 0.05, effect, ICC,
 # If passing vectors to the various parameters of this function,
 # it must be done in a for loop.
 
-getCRTeffect <- function(alpha = 0.05, power = 0.80, ICC = 0.001,
-                         M = 6, n = 100, type = "standard", cv = NULL,
-                         tol = .Machine$double.eps^0.25){
+get_effect <- function(alpha = 0.05, power = 0.80, ICC = 0.001,
+                       M = 6, n = 100, type = "standard", cv = NULL,
+                       tol = .Machine$double.eps^0.25){
 
   # cv value needs to be present if type = cv
   if (type == "cv" & is.null(cv)) {
