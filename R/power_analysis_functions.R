@@ -81,15 +81,15 @@ get_effect <- function(alpha = 0.05, power = 0.80, ICC = 0.001,
   # creates a function call to evaluate the power in uniroot
   p.body <- quote({
     qu <- qt(alpha/2, M - 2, lower.tail = FALSE)
-    pt(qu, M - 2, ncp = sqrt(0.5*M*n/(2*DEFF)) * delta, lower.tail = FALSE) +
-      pt(-qu, M - 2, ncp = sqrt(0.5*M*n/(2*DEFF)) * delta, lower.tail = TRUE)
+    pt(qu, M - 2, ncp = sqrt(0.5*M*n/(2*DEFF)) * effect, lower.tail = FALSE) +
+      pt(-qu, M - 2, ncp = sqrt(0.5*M*n/(2*DEFF)) * effect, lower.tail = TRUE)
   })
 
   # uniroot scans an interval looking for the root of listed function
-  delta <- uniroot(function(delta) eval(p.body) - power,
+  effect <- uniroot(function(effect) eval(p.body) - power,
                    interval = c(1e-07, 1e+07),
                    tol = tol, extendInt = "upX")$root
-  return(delta)
+  return(effect)
 }
 
 # change
