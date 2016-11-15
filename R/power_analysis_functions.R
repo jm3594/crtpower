@@ -1,27 +1,15 @@
-#------------------------------------------------------------------------------
+#' Calculate the power of a cluster randomized design.
 
-# Power Analysis Functions
-
-# These functions are used to calculate power, effect size, sample size, etc.
-
-#------------------------------------------------------------------------------
-
-# getCRTPower
-
-# This function calculates either the standard CRT Power of the CV correction
-
-# INPUT:
-# alpha is level of significance
-# effect is the effect size
-# M is number of clusters
-# n is mean cluster size
-# type is either standard DEFF or cv-based DEFF
-# cv is coefficient of variation
-
-# OUTPUT:
-# pwr is the calculated power
-
-get_power <- function(alpha = 0.05, effect, ICC,
+#' @param alpha The level of significance.
+#' @param delta The effect size
+#' @param ICC The intra-class correlation.
+#' @param M The total number of clusters.
+#' @param n The mean cluster size.
+#' @param type The type of design effect, either standard or based on
+#'   the coefficient of variation.
+#' @param cv The coefficient of variation, if type is cv.
+#' @return pwr The calculated power.
+get_power <- function(alpha = 0.05, delta, ICC,
                       M, n, type = "standard", cv = NULL){
 
   # cv value needs to be present if type = cv
@@ -41,24 +29,18 @@ get_power <- function(alpha = 0.05, effect, ICC,
   return(power)
 }
 
-#------------------------------------------------------------------------------
+#' Calculate the standardized effect size, delta.
 
-# getCRTeffect
-
-# This function calculates observable effect size
-
-# INPUT:
-# alpha is level of significance
-# power is the power
-# ICC is the intra class correlation
-# M is number of clusters
-# n is mean cluster size
-# type is either standard DEFF or cv-based DEFF
-# cv is coefficient of variation
-# tol is a tolerance value
-
-# OUTPUT:
-# delta is the effect size
+#' @param alpha The level of significance.
+#' @param power The power.
+#' @param ICC The intra class correlation.
+#' @param M The total number of clusters.
+#' @param n The mean cluster size.
+#' @param type The type of design effect, either standard or based on
+#'   the coefficient of variation.
+#' @param cv The coefficient of variation, if type is cv.
+#' @param tol A tolerance value.
+#' @return delta The effect size.
 
 # NOTE:
 # If passing vectors to the various parameters of this function,
