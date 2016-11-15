@@ -1,11 +1,11 @@
 Package: crtpower
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Power Analysis Functions for Cluster Randomized Trials
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
+Authors@R: person("Jon","Moyer",email = "jon.moyer@gmail.com", role = c("aut","cre"))
+Description: Implementations of power analysis functions for cluster randomized trials. It includes
+    functions to do calculations analytically or by simulation.
 License: What license is it under?
 LazyData: TRUE
 URL: http://github.com/jm3594
-Issues: http://github.com/jm3594/crtpower/issues
+BugReports: http://github.com/jm3594/crtpower/issues
