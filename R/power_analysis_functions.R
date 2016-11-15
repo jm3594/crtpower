@@ -128,8 +128,8 @@ get_M <- function(alpha = 0.05, power = 0.80, ICC = 0.001,
 #' @param tol A tolerance value.
 #' @return n The mean cluster size.
 
-get_n <- function(alpha = 0.05, power = 0.80, ICC = 0.001,
-                  delta = 0.2, M = 6, type = "standard", cv = NULL,
+get_n <- function(power = 0.80, ICC = 0.001, delta = 0.2,
+                  M = 6, n = 100, type = "standard", cv = NULL,
                   tol = .Machine$double.eps^0.25){
 
   # cv value needs to be present if type = cv
@@ -153,4 +153,45 @@ get_n <- function(alpha = 0.05, power = 0.80, ICC = 0.001,
                interval = c(2 + 1e-10, 1e+07),
                tol = tol, extendInt = "upX")$root
   return(n)
+}
+
+#' Calculate the level of significance.
+
+#' @param power The power.
+#' @param ICC The intra class correlation.
+#' @param delta The effect size.
+#' @param M The total number of clusters.
+#' @param n The mean cluster size.
+#' @param type The type of design effect, either standard or based on
+#'   the coefficient of variation.
+#' @param cv The coefficient of variation, if type is cv.
+#' @param tol A tolerance value.
+#' @return alpha The level of significance.
+
+get_alpha <- function(power = 0.80, ICC = 0.001, delta = 0.2,
+                      M = 6, n = 100, type = "standard", cv = NULL,
+                      tol = .Machine$double.eps^0.25){
+
+  # cv value needs to be present if type = cv
+  if (type == "cv" & is.null(cv)) {
+    stop("The cv is NULL. Specify a cv.")
+  }
+
+  # select DEFF based on type
+  DEFF <- switch(type,
+                 "standard" = 1 + (n - 1)*ICC,
+                 "cv" = 1 + (((cv^2 + 1)*n) - 1)*ICC)
+
+  # creates a function call to evaluate the power in uniroot
+  p.body <- quote({
+    qu <- qt(alpha/2, M - 2, lower.tail = FALSE)
+    pt(qu, M - 2, ncp = sqrt(0.5*M*n/(2*DEFF)) * delta, lower.tail = FALSE) +
+      pt(-qu, M - 2, ncp = sqrt(0.5*M*n/(2*DEFF)) * delta, lower.tail = TRUE)
+  })
+
+  # uniroot scans an interval looking for the root of listed function
+  alpha <- uniroot(function(alpha) eval(p.body) - power,
+               interval = c(1e-10, 1 - 1e-10),
+               tol = tol, extendInt = "yes")$root
+  return(alpha)
 }
