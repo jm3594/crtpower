@@ -1,19 +1,13 @@
-# crtPowerSim
+#' Calculate the p-value for a cluster randomized trial by simulation.
 
-# This function gets the P-value for the CRT assuming various parameter values
-
-# INPUT:
-# M is the number of clusters
-# n is the mean cluster size
-# a is min of unif distribution
-# stdev is sd of errors
-# stdevb is sd of random effects
-# B0 overall intercept
-# B1 treatment effect
-
-# OUTPUT:
-# pval is the p-value under the alternative hypothesis
-
+#' @param M The total number of clusters.
+#' @param n The mean cluster size.
+#' @param a The minimum of the uniform distribution used to generate cluster sizes.
+#' @param vare The variance of the measurement error.
+#' @param varb The variance of the random effects.
+#' @param B0 The overall intercept.
+#' @param B1 The standardized treatment effect.
+#' @return The p-value under the null hypothesis.
 crtPowerSim <- function(M = 10, n = 10, a = 10,
                         vare = 0.95, varb = 0.05,
                         B0 = 0, B1 = 0.2) {
@@ -26,8 +20,8 @@ crtPowerSim <- function(M = 10, n = 10, a = 10,
   e <- rnorm(N, sd = sde) # generate random errors
   i <- rep(1:M, times = n_vec) # generate cluster ids
   groups <- rep(c(0,1), each = M/2) # set up groups, 0 = ctrl, 1 = trtmnt
-  randassign <- sample(groups) # get a permutation of groups
-  x <- rep(randassign,times = n_vec) # random assign groups
+  # randassign <- sample(groups) # get a permutation of groups
+  x <- rep(groups, times = n_vec) # random assign groups
   y <- B0 + x*B1 + b + e # create response vector
   crt.mod <- lmer(y ~ x + (1|i)) # create lmm for crt
 
@@ -39,4 +33,3 @@ crtPowerSim <- function(M = 10, n = 10, a = 10,
 
 }
 
-# test to check out commits
