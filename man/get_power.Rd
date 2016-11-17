@@ -9,7 +9,7 @@ get_power(alpha = 0.05, delta, ICC, M, n, type = "standard", cv = NULL)
 \arguments{
 \item{alpha}{The level of significance.}
 
-\item{delta}{The effect size}
+\item{delta}{The effect size.}
 
 \item{ICC}{The intra-class correlation.}
 
