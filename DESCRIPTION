@@ -2,7 +2,8 @@ Package: crtpower
 Type: Package
 Title: Power Analysis Functions for Cluster Randomized Trials
 Version: 0.0.0.9000
-Authors@R: person("Jon","Moyer",email = "jon.moyer@gmail.com", role = c("aut","cre"))
+Authors@R: c(person("Jon","Moyer",email = "jon.moyer@gmail.com", role = c("aut","cre")),
+    person("Ken","Kleinman", email = "ken.kleinman@gmail.com", rol = c("aut")))
 Description: Implementations of power analysis functions for cluster randomized
     trials. It includes functions to do calculations analytically or by simulation.
 License: What license is it under?
