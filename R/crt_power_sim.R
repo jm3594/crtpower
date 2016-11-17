@@ -1,6 +1,7 @@
-#' Calculate the p-value for a cluster randomized trial by simulation.
-
-#' @param M The total number of clusters.
+#' Simple cluster randomized trial p-values
+#'
+#' Calculates the p-value of a cluster randomized trial by simulation.
+#' @param m The number of clusters per arm.
 #' @param n The mean cluster size.
 #' @param a The minimum of the uniform distribution used to generate cluster sizes.
 #' @param vare The variance of the measurement error.
