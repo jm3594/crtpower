@@ -4,8 +4,8 @@
 \alias{power.crt.test}
 \title{Power calculations for simple cluster randomized trials}
 \usage{
-power.crt.test(alpha = 0.05, power = 0.8, m = NULL, n = NULL, d = 0.2,
-  ICC = 0.001, type = "standard", cv = NULL,
+power.crt.test(alpha = 0.05, power = 0.8, M = NULL, n = NULL, d = 0.2,
+  ICC = NULL, type = "standard", cv = NULL,
   tol = .Machine$double.eps^0.25)
 }
 \arguments{
@@ -13,7 +13,7 @@ power.crt.test(alpha = 0.05, power = 0.8, m = NULL, n = NULL, d = 0.2,
 
 \item{power}{The power of the test, 1 minus the probability of a Type II error.}
 
-\item{m}{The number of clusters per arm.}
+\item{M}{The total number of clusters.}
 
 \item{n}{The mean cluster size.}
 
@@ -21,12 +21,12 @@ power.crt.test(alpha = 0.05, power = 0.8, m = NULL, n = NULL, d = 0.2,
 
 \item{ICC}{The intra-class correlation.}
 
-\item{type}{The type of design effect, either standard or based on
-the coefficient of variation.}
+\item{type}{The type of design effect, either 'standard' or based on
+the coefficient of variation 'cv'.}
 
 \item{cv}{The coefficient of variation. Used when 'type' is 'cv'.}
 
-\item{tol}{Numerican tolerance used in root finding. The default providing
+\item{tol}{Numerical tolerance used in root finding. The default providing
 (at least) four significant digits.}
 }
 \value{

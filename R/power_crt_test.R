@@ -2,29 +2,48 @@
 #'
 #' Compute the power of a simple cluster randomized trial, or determine
 #'   parameters to obtain a target power.
-#' @param alpha The level of significance of the test, the probability of a Type I error.
-#' @param power The power of the test, 1 minus the probability of a Type II error.
-#' @param d The standardized effect size.
+#' @param alpha The level of significance of the test, the probability of a
+#'   Type I error.
+#' @param power The power of the test, 1 minus the probability of a Type II
+#'   error.
+#' @param d The standardized effect size, or a vector of cluster sizes with
+#'   length equal to M.
 #' @param ICC The intra-class correlation.
-#' @param m The number of clusters per arm.
+#' @param M The total number of clusters.
 #' @param n The mean cluster size.
-#' @param type The type of design effect, either standard or based on
-#'   the coefficient of variation.
+#' @param type The type of design effect, either 'standard' or based on
+#'   the coefficient of variation 'cv'.
 #' @param cv The coefficient of variation. Used when 'type' is 'cv'.
-#' @param tol Numerican tolerance used in root finding. The default providing
-#'   (at least) four significant digits.
+#' @param tol Numerical tolerance used in root finding. The default provides
+#'   at least four significant digits.
 #' @return The computed argument.
 
 power.crt.test <- function(alpha = 0.05, power = 0.80,
-                           m = NULL, n = NULL,
-                           d = 0.20, ICC = 0.001,
+                           M = NULL, n = NULL,
+                           d = 0.20, ICC = NULL,
                            type = "standard", cv = NULL,
                            tol = .Machine$double.eps^0.25){
 
   # check to see that exactly one of the paramaters not specified
-  num_null <- sum(sapply(list(alpha, power, m, n, d, ICC), is.null))
+  num_null <- sum(sapply(list(alpha, power, M, n, d, ICC), is.null))
   if (num_null != 1) {
-    stop("Exactly one of 'alpha', 'power', 'm', 'n', 'd', and 'ICC' must be NULL")
+    stop("Exactly one of 'alpha', 'power', 'M', 'n', 'd', and 'ICC' must be NULL")
+  }
+
+  # if n is a vector of cluster sizes, calculate mean cluster size and cv
+  if (length(n) > 1) {
+    if (length(n) != M) {
+      stop("length(n) is not equal to M. Enter a vector of the correct length,
+           or enter one number for mean cluster size.")
+    }
+    if (type != "cv") {
+      warning("length(n) > 1, so 'type' will be set to 'cv'")
+      type <- "cv" # force type to be cv
+    }
+    n_mean <- mean(n) # find mean cluster size
+    n_sd <- sd(n) # find sd of cluster sizes
+    cv <- n_sd/n_mean # calculate cv
+    n <- n_mean # set n to mean cluster size
   }
 
   # cv value needs to be present if type = cv
@@ -42,21 +61,21 @@ power.crt.test <- function(alpha = 0.05, power = 0.80,
   # create call to evaluate power
   if (is.null(n) | is.null(ICC)) {
     p.body <- quote({
-      # because n/ICC get updated, DEFF gets updated, so put inside call
+      # because n/ICC get updated, DEFF gets updated, so define inside call
       DEFF <- getDEFF(type, n, ICC, cv)
-      qu <- qt(alpha/2, 2*(m - 1), lower.tail = FALSE)
-      ncp <- sqrt(m*n/(2*DEFF)) * d
-      pt(qu, 2*(m - 1), ncp, lower.tail = FALSE) +
-        pt(-qu, 2*(m - 1), ncp, lower.tail = TRUE)
+      qu <- qt(alpha/2, M - 2, lower.tail = FALSE)
+      ncp <- sqrt((M/2)*n/(2*DEFF)) * d
+      pt(qu, M - 2, ncp, lower.tail = FALSE) +
+        pt(-qu, M - 2, ncp, lower.tail = TRUE)
     })
   } else {
     # DEFF doesn't depend on alpha, power, m, or d, so define outside call
     DEFF <- getDEFF(type, n, ICC, cv)
     p.body <- quote({
-      qu <- qt(alpha/2, 2*(m - 1), lower.tail = FALSE)
-      ncp <- sqrt(m*n/(2*DEFF)) * d
-      pt(qu, 2*(m - 1), ncp, lower.tail = FALSE) +
-        pt(-qu, 2*(m - 1), ncp, lower.tail = TRUE)
+      qu <- qt(alpha/2, M - 2, lower.tail = FALSE)
+      ncp <- sqrt((M/2)*n/(2*DEFF)) * d
+      pt(qu, M - 2, ncp, lower.tail = FALSE) +
+        pt(-qu, M - 2, ncp, lower.tail = TRUE)
     })
   }
 
@@ -82,12 +101,12 @@ power.crt.test <- function(alpha = 0.05, power = 0.80,
     return(d)
   }
 
-  # calculate m
-  if (is.null(m)) {
-    m <- uniroot(function(m) eval(p.body) - power,
+  # calculate M
+  if (is.null(M)) {
+    M <- uniroot(function(M) eval(p.body) - power,
                  interval = c(2 + 1e-10, 1e+07),
                  tol = tol, extendInt = "upX")$root
-    return(m)
+    return(M)
   }
 
   # calculate n
