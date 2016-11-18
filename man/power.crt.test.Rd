@@ -9,15 +9,18 @@ power.crt.test(alpha = 0.05, power = 0.8, M = NULL, n = NULL, d = 0.2,
   tol = .Machine$double.eps^0.25)
 }
 \arguments{
-\item{alpha}{The level of significance of the test, the probability of a Type I error.}
+\item{alpha}{The level of significance of the test, the probability of a
+Type I error.}
 
-\item{power}{The power of the test, 1 minus the probability of a Type II error.}
+\item{power}{The power of the test, 1 minus the probability of a Type II
+error.}
 
-\item{M}{The total number of clusters.}
+\item{M}{The total number of clusters. It should be even and greater than 2.}
 
-\item{n}{The mean cluster size.}
+\item{n}{The mean cluster size, or a vector of cluster sizes.}
 
-\item{d}{The standardized effect size.}
+\item{d}{The standardized effect size, or a vector of cluster sizes with
+length equal to M.}
 
 \item{ICC}{The intra-class correlation.}
 
@@ -26,8 +29,8 @@ the coefficient of variation 'cv'.}
 
 \item{cv}{The coefficient of variation. Used when 'type' is 'cv'.}
 
-\item{tol}{Numerical tolerance used in root finding. The default providing
-(at least) four significant digits.}
+\item{tol}{Numerical tolerance used in root finding. The default provides
+at least four significant digits.}
 }
 \value{
 The computed argument.

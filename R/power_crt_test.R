@@ -9,8 +9,8 @@
 #' @param d The standardized effect size, or a vector of cluster sizes with
 #'   length equal to M.
 #' @param ICC The intra-class correlation.
-#' @param M The total number of clusters.
-#' @param n The mean cluster size.
+#' @param M The total number of clusters. It should be even and greater than 2.
+#' @param n The mean cluster size, or a vector of cluster sizes.
 #' @param type The type of design effect, either 'standard' or based on
 #'   the coefficient of variation 'cv'.
 #' @param cv The coefficient of variation. Used when 'type' is 'cv'.
