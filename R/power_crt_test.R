@@ -60,8 +60,8 @@ power.crt.test <- function(alpha = 0.05, power = 0.80,
 
   # create call to evaluate power
   if (is.null(n) | is.null(ICC)) {
+    # if n or ICC is null, DEFF gets updated, so define DEFF inside call
     p.body <- quote({
-      # because n/ICC get updated, DEFF gets updated, so define inside call
       DEFF <- getDEFF(type, n, ICC, cv)
       qu <- qt(alpha/2, M - 2, lower.tail = FALSE)
       ncp <- sqrt((M/2)*n/(2*DEFF)) * d
