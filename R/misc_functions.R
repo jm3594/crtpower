@@ -17,7 +17,7 @@ getClustSize <- function(M, n, a, b = n*2 - a) {
 
 #------------------------------------------------------------------------------
 
-# completely unnecessary formatting function!!!
+# minute formatting function
 fix_minute <- function(x) {
   # Pass in minute(some_time)
   # if minute is less than 10, function will paste a 0 in tens place
