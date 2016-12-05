@@ -57,16 +57,11 @@ power.crt.test <- function(alpha = 0.05, power = 0.80,
     n <- n_mean # set n to mean cluster size
   }
 
-  # function to get design effect
-  getDEFF <- function(type, n, ICC, cv) {
-    1 + (((cv^2 + 1)*n) - 1)*ICC
-  }
-
   # create call to evaluate power
   if (is.null(n) | is.null(ICC)) {
     # if n or ICC is null, DEFF gets updated, so define DEFF inside call
     p.body <- quote({
-      DEFF <- getDEFF(type, n, ICC, cv)
+      DEFF <- getDEFF(n, ICC, cv)
       qu <- qt(alpha/2, 2*(m - 1), lower.tail = FALSE)
       ncp <- sqrt(m*n/(2*DEFF)) * d
       pt(qu, 2*(m - 1), ncp, lower.tail = FALSE) +
@@ -74,7 +69,7 @@ power.crt.test <- function(alpha = 0.05, power = 0.80,
     })
   } else {
     # DEFF doesn't depend on alpha, power, m, or d, so define outside call
-    DEFF <- getDEFF(type, n, ICC, cv)
+    DEFF <- getDEFF(n, ICC, cv)
     p.body <- quote({
       qu <- qt(alpha/2, 2*(m - 1), lower.tail = FALSE)
       ncp <- sqrt(m*n/(2*DEFF)) * d
