@@ -4,9 +4,8 @@
 \alias{power.crt.test}
 \title{Power calculations for simple cluster randomized trials}
 \usage{
-power.crt.test(alpha = 0.05, power = 0.8, M = NULL, n = NULL, d = 0.2,
-  ICC = NULL, type = "standard", cv = NULL,
-  tol = .Machine$double.eps^0.25)
+power.crt.test(alpha = 0.05, power = 0.8, m = NULL, n = NULL, d = 0.2,
+  ICC = NULL, cv = 0, tol = .Machine$double.eps^0.25)
 }
 \arguments{
 \item{alpha}{The level of significance of the test, the probability of a
@@ -15,19 +14,17 @@ Type I error.}
 \item{power}{The power of the test, 1 minus the probability of a Type II
 error.}
 
-\item{M}{The total number of clusters. It should be even and greater than 2.}
+\item{m}{The number of clusters per condition. It should be greater than 1.}
 
-\item{n}{The mean cluster size, or a vector of cluster sizes.}
+\item{n}{The mean cluster size, or a vector of cluster sizes with
+length equal to twice \code{m}.}
 
-\item{d}{The standardized effect size, or a vector of cluster sizes with
-length equal to M.}
+\item{d}{The standardized effect size.}
 
 \item{ICC}{The intra-class correlation.}
 
-\item{type}{The type of design effect, either 'standard' or based on
-the coefficient of variation 'cv'.}
-
-\item{cv}{The coefficient of variation. Used when 'type' is 'cv'.}
+\item{cv}{The coefficient of variation. When \code{cv} = 0, the cluster all
+have the same size.}
 
 \item{tol}{Numerical tolerance used in root finding. The default provides
 at least four significant digits.}
@@ -38,5 +35,24 @@ The computed argument.
 \description{
 Compute the power of a simple cluster randomized trial, or determine
   parameters to obtain a target power.
+}
+\details{
+Exactly one of \code{alpha}, \code{power}, \code{d}, \code{ICC}, \code{m},
+  \code{n}, and \code{cv} must be passed as \code{NULL}. Note that
+  \code{alpha}, \code{power}, \code{d}, and \code{cv} have non-\code{NULL}
+  defaults, so if those are the parameters of interest they must be
+  explicitly passed as \code{NULL}.
+}
+\section{Note}{
+
+  'uniroot' is used to solve power equation for unknowns, so you may see
+  errors from it, notably about inability to bracket the root when
+  invalid arguments are given.
+}
+
+\section{Authors}{
+
+Jonathan Moyer (\email{jon.moyer@gmail.com}), but this function is based on
+  work by Peter Dalgaard (power.t.test) and Stephane Champely (pwr.t.test).
 }
 
