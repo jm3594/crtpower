@@ -9,6 +9,12 @@
 #'   defaults, so if those are the parameters of interest they must be
 #'   explicitly passed as \code{NULL}.
 #'
+#' The user can specify either the number of clusters per condition, \code{m},
+#'   or the total number of clusters, \code{M}. If \code{m} is \code{NULL}
+#'   and \code{M} isn't, then \code{m} will be calculated as half of \code{M}.
+#'   If both \code{m} and \code{M} are \code{NULL} and the other parameters
+#'   are not, the function will return \code{m}.
+#'
 #' @section Note:
 #'   'uniroot' is used to solve power equation for unknowns, so you may see
 #'   errors from it, notably about inability to bracket the root when
@@ -25,6 +31,7 @@
 #' @param d The standardized effect size.
 #' @param ICC The intra-class correlation.
 #' @param m The number of clusters per condition. It should be greater than 1.
+#' @param M The total number of clusters, or twice \code{m}.
 #' @param n The mean cluster size, or a vector of cluster sizes with
 #'   length equal to twice \code{m}.
 #' @param cv The coefficient of variation. When \code{cv} = 0, the cluster all
@@ -34,10 +41,12 @@
 #' @return The computed argument.
 
 power.crt.test <- function(alpha = 0.05, power = 0.80,
-                           m = NULL, n = NULL,
-                           d = 0.20, ICC = NULL,
-                           cv = 0,
+                           m = NULL, M = NULL,
+                           n = NULL, d = 0.20,
+                           ICC = NULL, cv = 0,
                            tol = .Machine$double.eps^0.25){
+
+  if(is.null(m) & !is.null(M)) m <- M/2
 
   # check to see that exactly one of the paramaters not specified
   num_null <- sum(sapply(list(alpha, power, m, n, d, ICC, cv), is.null))
