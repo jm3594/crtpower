@@ -1,7 +1,5 @@
 # Run a simulation
 
-# This file contains the code needed to generate the data for the paper.
-
 library(lme4)
 library(ggplot2)
 library(dplyr)
@@ -23,8 +21,21 @@ n0 <- c(10, 30, 100)
 d0 <- 0
 cv0 <- seq(0,0.55, by = 0.05)
 
+# alternate set of vectors to pass to get_df() function
+# ICC0 <- c(0.01, 0.05, 0.01, 0.05)
+# m0 <- c(2, 5, 10, 25)
+# n0 <- c(10, 20, 50, 100)
+# d0 <- 0
+# cv0 <- 0
+
 # create data frame to iterate over
 df <- get_df(ICC0, m0, n0, cv0, d0)
+
+# bobyqa warning counter for each row of data frame
+ww <- numeric(nrow(df))
+
+# string to capture with using tryCatch
+warn_string <- "bobyqa"
 
 nsim <- 20000
 

@@ -6,11 +6,16 @@
 
 # getClustSize
 
-# This function generates the cluster sizes for the specified parameters:
-# M is number of clusters
+# This function generates the cluster sizes for the specified parameters.
+
+# INPUT:
+# m is number of clusters per condition
 # n is mean cluster size
 # a is min of unif distribution
 # b is max of unif distribution
+
+# OUTPUT:
+# A length 2*m vector of random uniform numbers rounded to the nearest integer
 getClustSize <- function(m, n, a, b = n*2 - a) {
   round(runif(2*m, a, b))
 }
@@ -29,6 +34,14 @@ fix_minute <- function(x) {
 #------------------------------------------------------------------------------
 
 # function to get design effect
+
+# INPUT:
+# n is the mean cluster size
+# ICC is the intraclass correlation
+# cv is the coefficient of variation
+
+# OUTPUT:
+# the design effect of the study
 getDEFF <- function(n, ICC, cv) {
   1 + (((cv^2 + 1)*n) - 1)*ICC
 }

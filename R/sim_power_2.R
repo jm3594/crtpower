@@ -46,13 +46,20 @@ sim_power <- function(nsim, m, n, a, d, ICC) {
     pvals <- numeric(nsim)
 
     pvals <- replicate(nsim,
-                       crtPowerSim(m = m[i],
-                                   n = n[i],
-                                   a = a[i],
-                                   B1 = d[i],
-                                   B0 = 0,
-                                   vare = 1 - ICC[i],
-                                   varb = ICC[i]
+                       tryCatch(
+                         crtPowerSim(m = m[i],
+                                     n = n[i],
+                                     a = a[i],
+                                     B1 = d[i],
+                                     B0 = 0,
+                                     vare = 1 - ICC[i],
+                                     varb = ICC[i]
+                         ),
+                         warning = function(w){
+                           if(grepl(warn_string, as.character(w))){
+                             ww[i] <<- ww[i] + 1
+                           }
+                         }
                        ))
 
     power[i] <- mean( pvals < 0.05 )
