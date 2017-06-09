@@ -17,12 +17,13 @@
 #' @param a The minimum of the uniform distribution used to generate cluster sizes.
 #' @param d The standardized effect size.
 #' @param ICC The intra-class correlation.
+#' @param warn Logical flag if keeping count of bobyqa warnings is desired.
 #' @return A list with length equal to m, n, a, d, or ICC. Each list member
 #'   contains the calculated power, \code{power}, and the upper and lower bounds
 #'   (\code{upper} and \code{lower}, respectively) of the exact 95% confidence
 #'   interval for the power.
 
-sim_power <- function(nsim, m, n, a, d, ICC) {
+sim_power <- function(nsim, m, n, a, d, ICC, warn = FALSE) {
 
   # initialize temporary vectors for holding power and the bounds of
   # the exact 95% CI for power
@@ -44,16 +45,35 @@ sim_power <- function(nsim, m, n, a, d, ICC) {
 
     # for each ICC, M, n, and cv, initialize pvals vector
     pvals <- numeric(nsim)
-
-    pvals <- replicate(nsim,
-                       crtPowerSim(m = m[i],
-                                   n = n[i],
-                                   a = a[i],
-                                   B1 = d[i],
-                                   B0 = 0,
-                                   vare = 1 - ICC[i],
-                                   varb = ICC[i]
-                       ))
+    
+    if (warn = TRUE) {
+      pvals <- replicate(nsim,
+                         tryCatch(
+                           crtPowerSim(m = m[i],
+                                       n = n[i],
+                                       a = a[i],
+                                       B1 = d[i],
+                                       B0 = 0,
+                                       vare = 1 - ICC[i],
+                                       varb = ICC[i]
+                           ),
+                           warning = function(w){
+                             if(grepl(warn_string, as.character(w))){
+                               ww[i] <<- ww[i] + 1
+                             }
+                           }
+                         ))
+    } else {
+      pvals <- replicate(nsim,
+                         crtPowerSim(m = m[i],
+                                     n = n[i],
+                                     a = a[i],
+                                     B1 = d[i],
+                                     B0 = 0,
+                                     vare = 1 - ICC[i],
+                                     varb = ICC[i]
+                         ))
+    }
 
     power[i] <- mean( pvals < 0.05 )
 

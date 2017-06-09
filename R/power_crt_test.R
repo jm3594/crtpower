@@ -21,67 +21,118 @@
 #'   invalid arguments are given.
 #'
 #' @section Authors:
-#' Jonathan Moyer (\email{jon.moyer@@gmail.com}), but this function is based on
-#'   work by Peter Dalgaard (power.t.test) and Stephane Champely (pwr.t.test).
+#' Jonathan Moyer (\email{jon.moyer@@gmail.com})
 #'
 #' @param alpha The level of significance of the test, the probability of a
 #'   Type I error.
 #' @param power The power of the test, 1 minus the probability of a Type II
 #'   error.
-#' @param d The standardized effect size.
-#' @param ICC The intra-class correlation.
-#' @param m The number of clusters per condition. It should be greater than 1.
-#' @param M The total number of clusters, or twice \code{m}.
-#' @param n The mean cluster size, or a vector of cluster sizes with
+#' @param m The number of clusters per condition. It must be greater than 1.
+#' @param n The mean of the cluster sizes, or a vector of cluster sizes with
 #'   length equal to twice \code{m}.
-#' @param cv The coefficient of variation. When \code{cv} = 0, the cluster all
-#'   have the same size.
+#' @param nsd The standard deviation of the cluster sizes.
+#' @param cv The coefficient of variation of the cluster sizes. When \code{cv} = 0,
+#'   the clusters all have the same size.
+#' @param d The difference in condition means.
+#' @param icc The intraclass correlation.
+#' @param varw The within-cluster variation.
+#' @param varb The between-cluster variation.
 #' @param tol Numerical tolerance used in root finding. The default provides
 #'   at least four significant digits.
 #' @return The computed argument.
 
-power.crt.test <- function(alpha = 0.05, power = 0.80,
-                           m = NULL, M = NULL,
-                           n = NULL, d = 0.20,
-                           ICC = NULL, cv = 0,
+source("R/misc_functions.R") # remove this before packagizing
+
+power.crt.test <- function(alpha = 0.05, power = 0.80, m = NULL,
+                           n = NULL, nsd = NULL, cv = NULL,
+                           d = NULL, icc = NULL,
+                           varw = NULL, varb = NULL,
                            tol = .Machine$double.eps^0.25){
 
-  if(is.null(m) & !is.null(M)) m <- M/2
-
-  # check to see that exactly one of the paramaters not specified
-  num_null <- sum(sapply(list(alpha, power, m, n, d, ICC, cv), is.null))
-  if (num_null != 1) {
-    stop("Exactly one of 'alpha', 'power', 'm', 'n', 'd', 'ICC', and 'cv' must be NULL")
+  if(!is.null(m) & m <= 1) {
+    stop("'m' must be greater than 1.")
   }
 
-  # if n is a vector of cluster sizes, calculate mean cluster size and cv
+  # if n is a vector of cluster sizes, calculate mean and cv of cluster sizes
   if (length(n) > 1) {
-    if (length(n) != 2*m) {
+    if (!is.null(m) && length(n) != 2*m) { # use && to evaluate !is.null(m) first
       stop("length(n) is not equal to 2*m. Enter a vector of the correct length,
            or enter one number for mean cluster size.")
     }
-    n_mean <- mean(n) # find mean cluster size
-    n_sd <- sd(n) # find sd of cluster sizes
-    cv <- n_sd/n_mean # calculate cv
-    n <- n_mean # set n to mean cluster size
+    nsd <- sd(n) # find sd of cluster sizes
+    n <- mean(n) # find mean cluster size
+    cv <- nsd/n  # find coeffient of variation
+  }
+
+  # list of all inputs
+  all_params <- list(alpha, power, m, n, nsd, cv, d, icc, varw, varb)
+
+  # get number of null values
+  all_null <- sum(unlist(lapply(all_params, is.null)))
+
+  # checking set of n, nsd, and cv
+  nlist <- list(n, nsd, cv)
+  nnames <- c("n","nsd","cv")
+  nind <- which(unlist(lapply(nlist, is.null))) # find null index
+  # check to make sure that both n and cv are not NULL
+  # if only one of n and cv is specified it will be assumed that the user wants other in the pair
+  if (is.null(n) & is.null(cv)){
+    stop("At least one of 'n' and 'cv' must not be NULL.")
+  }
+
+  # if one of n, nsd, and cv is null, calculate it
+  if (length(nind) == 1) {
+    assign(nnames[nind], calc_n(nind, n, nsd, cv))
+    # if num_null also is 1, then return the value just calculated
+    if (all_null == 1) {
+      return(get(nnames[nind]))
+    }
+  }
+
+  # checking set of icc, varw, varb
+  icclist <- list(icc, varw, varb)
+  iccnames <- c("icc","varw","varb")
+  iccind <- which(unlist(lapply(icclist, is.null))) # find null index
+  # check to make sure that at least two of icc, varw, and varb is not null
+  # if only one of n and cv is specified it will be assumed that the user wants other in the pair
+  #   the user can calculate nsd from these two if so desired
+  if (length(iccind) > 1){
+    stop("At least two of 'icc', 'varw', and 'varb' must not be NULL.")
+  }
+
+  # if one of icc, varw, and varb is null, calculate it
+  if (length(iccind) == 1) {
+    assign(iccnames[iccind], calc_icc(iccind, icc, varw, varb))
+    # if num_null also is 1, then return the value just calculated
+    if (all_null == 1) {
+      return(get(iccnames[iccind]))
+    }
+  }
+
+  # list of needed inputs
+  needed_params <- list(alpha, power, m, n, cv, d, icc, varw)
+  needed_null <- sum(unlist(lapply(needed_params, is.null)))
+  # check to see that exactly one needed param is null
+  if(needed_null != 1){
+    stop("Exactly one of 'alpha', 'power', 'm', 'n', 'cv', 'd', 'icc', and 'varw' must be NULL.")
   }
 
   # create call to evaluate power
-  if (is.null(n) | is.null(ICC)) {
-    # if n or ICC is null, DEFF gets updated, so define DEFF inside call
+  if (is.null(n) | is.null(cv) | is.null(icc)) {
+    # if n, cv, or icc is null, DEFF gets updated, so define DEFF inside call
     p.body <- quote({
-      DEFF <- getDEFF(n, ICC, cv)
+      DEFF <- getDEFF(n, cv, icc)
       qu <- qt(alpha/2, 2*(m - 1), lower.tail = FALSE)
-      ncp <- sqrt(m*n/(2*DEFF)) * d
+      ncp <- sqrt(m*n/(2*DEFF)) * d/sqrt(varw)
       pt(qu, 2*(m - 1), ncp, lower.tail = FALSE) +
         pt(-qu, 2*(m - 1), ncp, lower.tail = TRUE)
     })
   } else {
     # DEFF doesn't depend on alpha, power, m, or d, so define outside call
-    DEFF <- getDEFF(n, ICC, cv)
+    DEFF <- getDEFF(n, cv, icc)
     p.body <- quote({
       qu <- qt(alpha/2, 2*(m - 1), lower.tail = FALSE)
-      ncp <- sqrt(m*n/(2*DEFF)) * d
+      ncp <- sqrt(m*n/(2*DEFF)) * d/sqrt(varw)
       pt(qu, 2*(m - 1), ncp, lower.tail = FALSE) +
         pt(-qu, 2*(m - 1), ncp, lower.tail = TRUE)
     })
@@ -101,14 +152,6 @@ power.crt.test <- function(alpha = 0.05, power = 0.80,
     return(power)
   }
 
-  # calculate d
-  if (is.null(d)) {
-    d <- uniroot(function(d) eval(p.body) - power,
-                 interval = c(1e-07, 1e+07),
-                 tol = tol, extendInt = "upX")$root
-    return(d)
-  }
-
   # calculate m
   if (is.null(m)) {
     m <- uniroot(function(m) eval(p.body) - power,
@@ -125,20 +168,28 @@ power.crt.test <- function(alpha = 0.05, power = 0.80,
     return(n)
   }
 
-  # calculate ICC
-  if (is.null(ICC)) {
-    ICC <- uniroot(function(ICC) eval(p.body) - power,
-                   interval = c(1e-7, 1e+07),
-                   tol = tol, extendInt = "downX")$root
-    return(ICC)
+  # calculate d
+  if (is.null(d)) {
+    d <- uniroot(function(d) eval(p.body) - power,
+                 interval = c(1e-07, 1e+07),
+                 tol = tol, extendInt = "upX")$root
+    return(d)
   }
 
-  # calculate cv
-  if (is.null(cv)) {
-    cv <- uniroot(function(cv) eval(p.body) - power,
-                  interval = c(1e-7, 1e+07),
-                  tol = tol, extendInt = "downX")$root
-    return(cv)
+  # calculate icc
+  if (is.null(icc)) {
+    icc <- uniroot(function(icc) eval(p.body) - power,
+                   interval = c(1e-07, 1e+07),
+                   tol = tol, extendInt = "downX")$root
+    return(icc)
+  }
+
+  # calculate varw
+  if (is.null(varw)) {
+    varw <- uniroot(function(varw) eval(p.body) - power,
+                    interval = c(1e-07, 1e+07),
+                    tol = tol, extendInt = "upX")$root
+    return(varw)
   }
 
 }

@@ -42,8 +42,57 @@ fix_minute <- function(x) {
 
 # OUTPUT:
 # the design effect of the study
-getDEFF <- function(n, ICC, cv) {
-  1 + (((cv^2 + 1)*n) - 1)*ICC
+# getDEFF <- function(n, ICC, cv) {
+#   1 + (((cv^2 + 1)*n) - 1)*ICC
+# }
+
+getDEFF <- function(n, cv, icc) {
+    1 + (((cv^2 + 1)*n) - 1)*icc
+}
+
+# getDEFF <- function(n, nsd, cv, varw, varb, icc) {
+#   if (!is.null(nsd) & is.null(n) & is.null(cv)){
+#     deffstring1 <- "1 + ((((nsd/n)^2 + 1)*n) - 1)"
+#   } else {
+#     deffstring1 <- "1 + (((cv^2 + 1)*n) - 1)"
+#   }
+#
+#   if (!is.null(varb) & is.null(varw) & is.null(icc)){
+#     deffstring2 <- "varb/(varw+varb)"
+#   } else {
+#     deffstring2 <- "icc"
+#   }
+#
+#   deffstring <- paste(deffstring1,deffstring2,sep="*")
+#   eval(parse(text=deffstring))
+# }
+
+#------------------------------------------------------------------------------
+
+# function to calculate one of n, n_sd, or cv if other two are not null
+
+calc_n <- function(ind, n, nsd, cv){
+  # input index of list element that's NULL
+  # 1 --> n = nsd/cv
+  # 2 --> nsd = n*cv
+  # 3 --> cv = nsd/n
+  switch(ind,
+         "1" = nsd/cv,
+         "2" = n*cv,
+         "3" = nsd/n)
 }
 
 #------------------------------------------------------------------------------
+
+# function to calculate one of ICC, varw, varb if other two are not null
+calc_icc <- function(ind, icc, varw, varb){
+  # input index of list element that's NULL
+  # 1 --> ICC
+  # 2 --> varw
+  # 3 --> varb
+  switch(ind,
+         "1" = varb/(varb+varw),
+         "2" = varb*(1-icc)/icc,
+         "3" = varw*icc/(1-icc))
+}
+
