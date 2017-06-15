@@ -46,27 +46,27 @@ fix_minute <- function(x) {
 #   1 + (((cv^2 + 1)*n) - 1)*ICC
 # }
 
-getDEFF <- function(n, cv, icc) {
-    1 + (((cv^2 + 1)*n) - 1)*icc
-}
-
-# getDEFF <- function(n, nsd, cv, varw, varb, icc) {
-#   if (!is.null(nsd) & is.null(n) & is.null(cv)){
-#     deffstring1 <- "1 + ((((nsd/n)^2 + 1)*n) - 1)"
-#   } else {
-#     deffstring1 <- "1 + (((cv^2 + 1)*n) - 1)"
-#   }
-#
-#   if (!is.null(varb) & is.null(varw) & is.null(icc)){
-#     deffstring2 <- "varb/(varw+varb)"
-#   } else {
-#     deffstring2 <- "icc"
-#   }
-#
-#   deffstring <- paste(deffstring1,deffstring2,sep="*")
-#   eval(parse(text=deffstring))
+# getDEFF <- function(n, cv, icc) {
+#     1 + (((cv^2 + 1)*n) - 1)*icc
 # }
 
+getDEFF <- function(n, nsd, cv, varw, varb, icc) {
+
+  # if n or cv is not null, use following formula for first part
+  if(!is.null(nsd)) {
+    deffstring1 <- "1 + ((((nsd/n)^2 + 1)*n) - 1)"
+  } else {
+    deffstring1 <- "1 + (((cv^2 + 1)*n) - 1)"
+  }
+
+  if (!is.null(varb)){
+    deffstring2 <- "varb/(varw+varb)"
+  } else {
+    deffstring2 <- "icc"
+  }
+  deffstring <- paste(deffstring1,deffstring2,sep="*")
+  eval(parse(text=deffstring))
+}
 #------------------------------------------------------------------------------
 
 # function to calculate one of n, n_sd, or cv if other two are not null
@@ -95,4 +95,3 @@ calc_icc <- function(ind, icc, varw, varb){
          "2" = varb*(1-icc)/icc,
          "3" = varw*icc/(1-icc))
 }
-
