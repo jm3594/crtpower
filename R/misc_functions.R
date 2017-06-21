@@ -95,3 +95,16 @@ calc_icc <- function(ind, icc, varw, varb){
          "2" = varb*(1-icc)/icc,
          "3" = varw*icc/(1-icc))
 }
+
+#------------------------------------------------------------------------------
+
+calc_p <- function(ind, p1, p2, d){
+  # input index of list element that's NULL
+  # 1 --> p1
+  # 2 --> p2
+  # 3 --> p3
+  switch(ind,
+         "1" = d + p2,
+         "2" = p1 - d,
+         "3" = p1 - p2)
+}

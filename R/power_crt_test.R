@@ -1,7 +1,7 @@
-#' Power calculations for simple cluster randomized trials
+#' Power calculations for simple cluster randomized trials, continuous outcome
 #'
-#' Compute the power of a simple cluster randomized trial, or determine
-#'   parameters to obtain a target power.
+#' Compute the power of a simple cluster randomized trial with a continuous outcome,
+#' or determine parameters to obtain a target power.
 #'
 #' Exactly one of \code{alpha}, \code{power}, \code{d}, \code{ICC}, \code{m},
 #'   \code{n}, and \code{cv} must be passed as \code{NULL}. Note that
