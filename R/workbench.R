@@ -13,7 +13,7 @@ varw <- 0.99
 varb <- NULL
 d <- 0.5*sqrt(varw)
 
-power.crt.test(alpha, power, m, n, nsd, cv, d, icc, varw, varb)
+crtpower.t.test(alpha, power, m, n, nsd, cv, d, icc, varw, varb)
 
 #----------------------------------------------------------
 
@@ -29,19 +29,19 @@ icc <- 0.02
 alpha <- 0.05
 power <- 0.90
 
-power.crt2p.test(alpha, power, m, n, cv, p2, d, icc)
+crtpower.2p.test(alpha, power, m, n, cv, p2, d, icc)
 
 #-----------------------------------------------------------
 
 # testing count outcome
 
-m <- 40
-n <- 20
+m <- 28
+n <- 424
 cv <- 0
-r1 <- 0.5
-d <- 0.1
-icc <- 0.02
+r1 <- 0.0148
+d <- 0.0044
+icc <- 0
 alpha <- 0.05
-power <- 0.90
+power <- NULL
 
-power.crt2rate.test(alpha, power, m, n, cv, r1, d, icc)
+crtpower.2r.test(alpha, power, m, n, cv, r1, d, icc)

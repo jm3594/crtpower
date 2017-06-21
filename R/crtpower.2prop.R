@@ -1,6 +1,6 @@
-#' Power calculations for simple cluster randomized trials, count outcome
+#' Power calculations for simple cluster randomized trials, binary outcome
 #'
-#' Compute the power of a simple cluster randomized trial with a count outcome,
+#' Compute the power of a simple cluster randomized trial with a binary outcome,
 #' or determine parameters to obtain a target power.
 #'
 #' @section Authors:
@@ -16,17 +16,18 @@
 #' @param cv The coefficient of variation of the cluster sizes. When \code{cv} = 0,
 #'   the clusters all have the same size.
 #' @param d The difference in proportions under the alternative hypothesis.
-#' @param r1 The rate in the control group.
+#' @param p2 The proportion in the control group.
 #' @param icc The intraclass correlation.
 #' @param tol Numerical tolerance used in root finding. The default provides
 #'   at least four significant digits.
 #' @return The computed argument.
 
+
 source("R/misc_functions.R") # remove this before packagizing
 
-power.crt2rate.test <- function(alpha = 0.05, power = 0.80,
+crtpower.2prop <- function(alpha = 0.05, power = 0.80,
                              m = NULL, n = NULL, cv = NULL,
-                             r1 = NULL, d = NULL, icc = NULL,
+                             p2 = NULL, d = NULL, icc = NULL,
                              tol = .Machine$double.eps^0.25){
 
   if(!is.null(m) && m <= 1) {
@@ -42,7 +43,7 @@ power.crt2rate.test <- function(alpha = 0.05, power = 0.80,
     nsd <- sd(n) # find sd of cluster sizes
     n <- mean(n) # find mean cluster size
     cv <- nsd/n  # find coeffient of variation
-    }
+  }
 
   # # checking set of p1, p2, and d
   # plist <- list(p1, p2, d)
@@ -54,11 +55,11 @@ power.crt2rate.test <- function(alpha = 0.05, power = 0.80,
   #   assign(pnames[pind], calc_p(pind, p1, p2, d))
   # }
 
-  r2 <- d + r1
+  p1 <- d + p2
 
   p.body <- quote({
     DEFF <- 1 + ((cv^2 + 1)*n - 1)*icc
-    sdd <- sqrt((r1 + r2)*DEFF/(m*n))
+    sdd <- sqrt((p1*(1-p1) + p2*(1-p2))*DEFF/(m*n))
     zcrit <- qnorm(alpha/2, lower.tail = FALSE)
     pnorm(zcrit - d/sdd, lower.tail = FALSE) +
       pnorm(-zcrit - d/sdd, lower.tail = TRUE)
@@ -87,11 +88,11 @@ power.crt2rate.test <- function(alpha = 0.05, power = 0.80,
     #return(m)
   }
 
-  # calculate r1
-  if (is.null(r1)) {
-    r1 <- uniroot(function(r1) eval(p.body) - power,
-                  interval = c(1e-07, 0.99999999),
-                  tol = tol)$root
+  # calculate p2
+  if (is.null(p2)) {
+    p2 <- uniroot(function(p2) eval(p.body) - power,
+                 interval = c(1e-07, 0.99999999),
+                 tol = tol)$root
   }
 
   # calculate d
@@ -129,7 +130,7 @@ power.crt2rate.test <- function(alpha = 0.05, power = 0.80,
 
   method <- "Clustered two-sample proportion power calculation"
   note <- "'m' is the number of clusters in each group and 'n' is the number of individuals in each cluster."
-  structure(list(m = m, n = n, cv = cv, d = d, r1 = r1, icc = icc,
+  structure(list(m = m, n = n, cv = cv, d = d, p2 = p2, icc = icc,
                  alpha = alpha, power = power,
                  note = note, method = method),
             class = "power.htest")
