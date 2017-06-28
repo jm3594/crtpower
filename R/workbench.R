@@ -3,7 +3,7 @@
 # testing continuous outcome
 
 alpha <- 0.05
-power <- NULL
+power <- 0.2233
 m <- 3
 n <- 100
 nsd <- 0
@@ -13,23 +13,25 @@ varw <- 0.99
 varb <- NULL
 d <- 0.5*sqrt(varw)
 
-crtpower.t.test(alpha, power, m, n, nsd, cv, d, icc, varw, varb)
+test <- crtpower.2mean(alpha, power, m, n, nsd, cv, d, icc, varw, varb)
+
+testfun <- Vectorize(crtpower.2mean)
 
 #----------------------------------------------------------
 
 # testing binary outcome
 
-m <- 25
-n <- NULL
+m <- 37.01758
+n <- 100
 cv <- 0
-p1 <- 0.51
-p2 <- 0.44
-d <- 0.07
-icc <- 0.02
+p1 <- 0.04
+p2 <- NULL
+icc <- 0.01
 alpha <- 0.05
-power <- 0.90
+power <- 0.80
+pooled <- FALSE
 
-crtpower.2p.test(alpha, power, m, n, cv, p2, d, icc)
+crtpower.2prop(alpha, power, m, n, cv, p1, p2, icc, pooled)
 
 #-----------------------------------------------------------
 

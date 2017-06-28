@@ -166,13 +166,14 @@ crtpower.2mean <- function(alpha = 0.05, power = 0.80, m = NULL,
 
   # create call to evaluate power
 
-  # if two of n, nsd, and cv are NULL or two of icc, varw, and varb are NULL
-  # if nsd is not null, it will be assumed the user wants n
-  # if n is not null, it will be assumed the user wants cv
-  # if cv is not null, it will be assumed the user wants n
-  # if varb is not null, it will be assumed the user wants varw
-  # if varw is not null, it will be assumed the user wants icc
-  # if icc is not null, it will be assumed the user wants varw
+  # if two of n, nsd, and cv are NULL:
+  #   if nsd is not null, it will be assumed the user wants n
+  #   if n is not null, it will be assumed the user wants cv
+  #   if cv is not null, it will be assumed the user wants n
+  # if two of icc, varw, and varb are NULL:
+  #   if varb is not null, it will be assumed the user wants varw
+  #   if varw is not null, it will be assumed the user wants icc
+  #   if icc is not null, it will be assumed the user wants varw
 
   # DEFF gets updated so define inside p.body
   if (length(nind) == 2 | length(iccind) == 2) {

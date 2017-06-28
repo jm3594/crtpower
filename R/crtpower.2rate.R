@@ -59,9 +59,11 @@ crtpower.2rate <- function(alpha = 0.05, power = 0.80,
   p.body <- quote({
     DEFF <- 1 + ((cv^2 + 1)*n - 1)*icc
     sdd <- sqrt((r1 + r2)*DEFF/(m*n))
-    zcrit <- qnorm(alpha/2, lower.tail = FALSE)
-    pnorm(zcrit - d/sdd, lower.tail = FALSE) +
-      pnorm(-zcrit - d/sdd, lower.tail = TRUE)
+    crit <- qpois(alpha/2, lower.tail = FALSE)
+    ppois(crit - d/sdd, lower.tail = FALSE) +
+      ppois(-crit - d/sdd, lower.tail = TRUE)
+    # pnorm(zcrit - d/sdd, lower.tail = FALSE) +
+    #   pnorm(-zcrit - d/sdd, lower.tail = TRUE)
   })
 
 
