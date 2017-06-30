@@ -75,8 +75,8 @@ crtpower.2prop <- function(alpha = 0.05, power = 0.80,
       sdd <- sqrt((p1*(1-p1) + p2*(1-p2))*DEFF/(m*n))
     }
     zcrit <- qnorm(alpha/2, lower.tail = FALSE)
-    pnorm(zcrit - (p1 - p2)/sdd, lower.tail = FALSE) +
-      pnorm(-zcrit - (p1 - p2)/sdd, lower.tail = TRUE)
+    pnorm(zcrit - abs(p1 - p2)/sdd, lower.tail = FALSE)# +
+      #pnorm(-zcrit - (p1 - p2)/sdd, lower.tail = TRUE)
   })
 
 

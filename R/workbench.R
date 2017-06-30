@@ -21,12 +21,12 @@ testfun <- Vectorize(crtpower.2mean)
 
 # testing binary outcome
 
-m <- 37.01758
-n <- 100
+m <- 20
+n <- 20
 cv <- 0
-p1 <- 0.04
+p1 <- 0.10
 p2 <- NULL
-icc <- 0.01
+icc <- 0.001
 alpha <- 0.05
 power <- 0.80
 pooled <- FALSE
